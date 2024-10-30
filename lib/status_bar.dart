@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:myeditor/providers/text_editing_provider.dart';
 
-class StatusBar extends StatelessWidget {
+class StatusBar extends ConsumerWidget {
   const StatusBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textEditingState = ref.watch(textEditingProvider);
+    final line = textEditingState.cursorPosition.line;
+    final col = textEditingState.cursorPosition.col;
     return Container(
       height: 30,
       padding: const EdgeInsets.symmetric(
@@ -14,11 +19,10 @@ class StatusBar extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            'Ln 13, Col 20',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: Colors.white),
+            'Ln $line, Col $col',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                ),
           ),
         ],
       ),

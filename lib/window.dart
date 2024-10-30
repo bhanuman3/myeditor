@@ -1,74 +1,83 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myeditor/cursor.dart';
+import 'package:myeditor/providers/settings_providers.dart';
+import 'package:myeditor/providers/text_editing_provider.dart';
 import 'package:myeditor/status_bar.dart';
 import 'package:myeditor/text_buffer.dart';
 
-class Window extends StatefulWidget {
+final FocusNode focusNode = FocusNode();
+
+class Window extends ConsumerWidget {
   const Window({super.key});
 
   @override
-  State<Window> createState() => _WindowState();
-}
-
-class _WindowState extends State<Window> {
-  String text = """class Main {
-  public static void main(String args[]) {
-    System.out.println("Hello world");
-  }
-}
-""";
-  final FocusNode focusNode = FocusNode();
-
-  final textStyle = const TextStyle(
-    fontSize: 16,
-    color: Colors.black,
-    fontFamily: 'Menlo',
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return Focus(
-      focusNode: focusNode,
-      autofocus: true,
-      onKeyEvent: (node, event) {
-        if (event is KeyUpEvent) {
-          return KeyEventResult.ignored;
-        }
-
-        if (event.logicalKey == LogicalKeyboardKey.backspace) {
-          setState(() {
-            List<String> c = text.split('');
-            c.removeLast();
-            text = c.join();
-          });
-          return KeyEventResult.handled;
-        }
-
-        if (event.character != null) {
-          setState(() {
-            text = text + event.character!;
-            print(text);
-          });
-        }
-
-        return KeyEventResult.handled;
-      },
-      child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  // const Cursor(),
-                  TextBuffer(text: text),
-                ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textStyle = ref.watch(textStyleProvider);
+    final textEditingState = ref.watch(textEditingProvider);
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(settingsProvider.notifier).increaseFontSize();
+                },
+                child: const Text('+'),
               ),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(settingsProvider.notifier).decreaseFontSize();
+                },
+                child: const Text('-'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(textEditingProvider.notifier).addChar('s');
+                },
+                child: const Text('Add char'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(textEditingProvider.notifier).delChar();
+                },
+                child: const Text('Remove char'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(textEditingProvider.notifier).moveCursorRight();
+                },
+                child: const Text('Cur R'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(textEditingProvider.notifier).moveCursorLeft();
+                },
+                child: const Text('Cur L'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(textEditingProvider.notifier).moveCursorDown();
+                },
+                child: const Text('Cur Dn'),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Stack(
+              children: [
+                const Cursor(),
+                TextBuffer(
+                  text: textEditingState.content,
+                  textStyle: textStyle,
+                ),
+              ],
             ),
-            const StatusBar(),
-          ],
-        ),
+          ),
+          const StatusBar(),
+        ],
       ),
     );
   }

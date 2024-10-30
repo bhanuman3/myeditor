@@ -1,36 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:myeditor/status_bar.dart';
-import 'package:myeditor/text_buffer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:myeditor/providers/settings_providers.dart';
+import 'package:myeditor/providers/text_editing_provider.dart';
 
-class Cursor extends StatelessWidget {
-  final String text;
-  final TextStyle style;
-
-  const Cursor({super.key, required this.text, required this.style});
+class Cursor extends ConsumerWidget {
+  const Cursor({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final Size textSize = _calculateTextSize(text, style);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cursorSize = ref.watch(cursorSizeProvider);
+    final state = ref.watch(textEditingProvider);
 
     return Positioned(
-      width: textSize.width,
-      height: textSize.height,
+      left: cursorSize.width * (state.cursorPosition.col - 1),
+      top: cursorSize.height * (state.cursorPosition.line - 1),
       child: Container(
-        width: textSize.width,
-        height: textSize.height,
+        width: cursorSize.width,
+        height: cursorSize.height,
         color: Colors.green,
       ),
     );
-  }
-
-  Size _calculateTextSize(String text, TextStyle style) {
-    final TextPainter textPainter = TextPainter(
-      text: TextSpan(text: text, style: style),
-      maxLines: 1,
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    return textPainter.size;
   }
 }
