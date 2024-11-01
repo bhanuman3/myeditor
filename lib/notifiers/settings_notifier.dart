@@ -19,4 +19,8 @@ class SettingsNotifier extends Notifier<Settings> {
   void decreaseFontSize() {
     state = state.copyWith(fontSize: state.fontSize - 1);
   }
+
+  void resetFontSize() {
+    state = state.copyWith(fontSize: 18);
+  }
 }

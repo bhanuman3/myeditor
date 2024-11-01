@@ -12,67 +12,84 @@ class TextBuffer extends ConsumerWidget {
     final focusNode = ref.watch(focusNodeProvider);
     final textStyle = ref.watch(textStyleProvider);
     final textEditingState = ref.watch(textEditingProvider);
-    return Focus(
-      focusNode: focusNode,
-      autofocus: true,
-      onKeyEvent: (node, event) {
-        if (event is KeyUpEvent) {
-          return KeyEventResult.ignored;
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.equal, meta: true): () {
+          ref.read(settingsProvider.notifier).increaseFontSize();
+        },
+        const SingleActivator(LogicalKeyboardKey.minus, meta: true): () {
+          ref.read(settingsProvider.notifier).decreaseFontSize();
+        },
+        const SingleActivator(LogicalKeyboardKey.digit0, meta: true): () {
+          ref.read(settingsProvider.notifier).resetFontSize();
         }
-
-        if (event.logicalKey == LogicalKeyboardKey.backspace) {
-          ref.read(textEditingProvider.notifier).delChar();
-          return KeyEventResult.handled;
-        }
-
-        if (event.logicalKey == LogicalKeyboardKey.enter) {
-          ref.read(textEditingProvider.notifier).newLine();
-          return KeyEventResult.handled;
-        }
-
-        if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-          ref.read(textEditingProvider.notifier).moveCursorRight();
-          return KeyEventResult.handled;
-        }
-
-        if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-          ref.read(textEditingProvider.notifier).moveCursorLeft();
-          return KeyEventResult.handled;
-        }
-
-        if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-          ref.read(textEditingProvider.notifier).moveCursorUp();
-          return KeyEventResult.handled;
-        }
-
-        if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-          ref.read(textEditingProvider.notifier).moveCursorDown();
-          return KeyEventResult.handled;
-        }
-
-        if (event.logicalKey == LogicalKeyboardKey.tab) {
-          print('tab pressed');
-          ref.read(textEditingProvider.notifier).tab();
-          return KeyEventResult.handled;
-        }
-
-        if (event.character != null) {
-          ref.read(textEditingProvider.notifier).addChar(event.character);
-          return KeyEventResult.handled;
-        }
-
-        return KeyEventResult.ignored;
       },
-      child: RichText(
-        text: TextSpan(
-          style: textStyle,
-          children: [
-            for (String line in textEditingState.lines!)
-              TextSpan(
-                text: '$line\n',
-                style: const TextStyle(),
-              ),
-          ],
+      child: Focus(
+        focusNode: focusNode,
+        autofocus: true,
+        onKeyEvent: (node, event) {
+          if (event is KeyUpEvent) {
+            return KeyEventResult.ignored;
+          }
+
+          if (event is KeyDownEvent &&
+              HardwareKeyboard.instance.isMetaPressed) {
+            return KeyEventResult.ignored; // Let `CallbackShortcuts` handle it
+          }
+
+          if (event.logicalKey == LogicalKeyboardKey.backspace) {
+            ref.read(textEditingProvider.notifier).delChar();
+            return KeyEventResult.handled;
+          }
+
+          if (event.logicalKey == LogicalKeyboardKey.enter) {
+            ref.read(textEditingProvider.notifier).newLine();
+            return KeyEventResult.handled;
+          }
+
+          if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+            ref.read(textEditingProvider.notifier).moveCursorRight();
+            return KeyEventResult.handled;
+          }
+
+          if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+            ref.read(textEditingProvider.notifier).moveCursorLeft();
+            return KeyEventResult.handled;
+          }
+
+          if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+            ref.read(textEditingProvider.notifier).moveCursorUp();
+            return KeyEventResult.handled;
+          }
+
+          if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+            ref.read(textEditingProvider.notifier).moveCursorDown();
+            return KeyEventResult.handled;
+          }
+
+          if (event.logicalKey == LogicalKeyboardKey.tab) {
+            ref.read(textEditingProvider.notifier).tab();
+            return KeyEventResult.handled;
+          }
+
+          if (event.character != null) {
+            ref.read(textEditingProvider.notifier).addChar(event.character);
+            return KeyEventResult.handled;
+          }
+
+          return KeyEventResult.ignored;
+        },
+        child: RichText(
+          text: TextSpan(
+            style: textStyle,
+            children: [
+              for (String line in textEditingState.lines!)
+                TextSpan(
+                  text: '$line\n',
+                  style: const TextStyle(),
+                ),
+            ],
+          ),
         ),
       ),
     );

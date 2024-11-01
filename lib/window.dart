@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myeditor/cursor.dart';
-import 'package:myeditor/providers/settings_providers.dart';
 import 'package:myeditor/status_bar.dart';
 import 'package:myeditor/text_buffer.dart';
 
@@ -12,27 +11,11 @@ class Window extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
+    return const Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(settingsProvider.notifier).increaseFontSize();
-                },
-                child: const Text('+'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(settingsProvider.notifier).decreaseFontSize();
-                },
-                child: const Text('-'),
-              ),
-            ],
-          ),
-          const Expanded(
+          Expanded(
             child: Stack(
               children: [
                 Cursor(),
@@ -40,7 +23,7 @@ class Window extends ConsumerWidget {
               ],
             ),
           ),
-          const StatusBar(),
+          StatusBar(),
         ],
       ),
     );
