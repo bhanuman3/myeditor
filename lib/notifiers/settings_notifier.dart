@@ -6,7 +6,7 @@ class SettingsNotifier extends Notifier<Settings> {
   @override
   Settings build() {
     return Settings(
-      fontSize: 24,
+      fontSize: 18,
       color: Colors.black,
       fontFamily: 'Menlo',
     );

@@ -12,12 +12,12 @@ class Cursor extends ConsumerWidget {
     final state = ref.watch(textEditingProvider);
 
     return Positioned(
-      left: cursorSize.width * (state.cursorPosition.col - 1),
-      top: cursorSize.height * (state.cursorPosition.line - 1),
+      left: cursorSize.width * (state.cursorPosition.col),
+      top: cursorSize.height * (state.cursorPosition.row),
       child: Container(
         width: cursorSize.width,
         height: cursorSize.height,
-        color: Colors.green,
+        color: Colors.deepOrange,
       ),
     );
   }

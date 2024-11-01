@@ -8,7 +8,7 @@ class StatusBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final textEditingState = ref.watch(textEditingProvider);
-    final line = textEditingState.cursorPosition.line;
+    final line = textEditingState.cursorPosition.row;
     final col = textEditingState.cursorPosition.col;
     return Container(
       height: 30,
